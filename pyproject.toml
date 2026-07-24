@@ -1,0 +1,67 @@
+[project]
+name = "PhD_chapter_2"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Nikita Savvin", email = "savvin.nikit@yandex.ru"},
+]
+
+dependencies = [
+    "pytest>=8.1.1",
+    "tox==4.14.2",
+    "pre-commit>=3.6.2",
+    "pytest-cov>=4.1.0",
+    "coverage-badge>=1.1.0",
+    "pdm-bump>=0.7.3",
+    "pydantic>=2.6.3",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "pandas==2.1.4",
+    "coverage<7.6",
+    "psycopg2-binary>=2.9.10",
+    "tensorflow>=2.18.0",
+    "scikit-learn==1.5.1",
+    "plotly>=6.0.0",
+    "openpyxl>=3.1.5",
+    "pydot>=3.0.4",
+    "torch>=2.6.0",
+    "tqdm>=4.67.3",
+    "xgboost>=3.0.0",
+    "matplotlib>=3.10.1",
+    "tslearn>=0.6.3",
+    "shap>=0.47.0",
+    "setuptools>=81.0.0",
+    "ephem>=4.2.1",
+    "statsmodels>=0.14.6",
+    "lightgbm>=4.6.0",
+    "catboost>=1.2.10",
+    "prophet>=1.3.0",
+    "neuralforecast>=3.1.8",
+    "numba<0.60",
+    "pmdarima>=2.1.1",
+    "tfts>=0.0.19",
+    "darts>=0.33.0",
+    "keras-tcn>=3.5.6",
+    "optuna>=4.8.0",
+    "kaleido>=1.3.0",
+    "holidays>=0.99",
+]
+
+requires-python = "==3.12.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+[tool.pdm.scripts._]
+env_file = ".env"
+
+[tool.pdm.build]
+package-dir = "src"
+includes = ["*"]
+pythonpath = ["src"]
+
+
+[tool.tox]
+env_list = ["3.12"]
+
+[tool.pdm]
+distribution = false
