@@ -3,6 +3,13 @@ pdm run src/experiments/main.py
 """
 import os
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 from tqdm import tqdm
 from src.utils.logger import get_logger
 from src.utils.progresser import progress_loader, progress_writer, csv_writer
@@ -12,11 +19,6 @@ from src.utils.charts import vis_ts_predict
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["MKL_NUM_THREADS"] = "1"
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
-os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
 WORKERS = 1
 
