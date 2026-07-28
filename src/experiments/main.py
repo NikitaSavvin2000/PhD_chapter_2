@@ -1,30 +1,19 @@
 """
 pdm run src/experiments/main.py
 """
-print(f"Line 4")
 import os
 
 from tqdm import tqdm
-print(f"Line 8")
 
 from src.utils.logger import get_logger
-print(f"Line 11")
-
 from src.utils.progresser import progress_loader, progress_writer, csv_writer
-print(f"Line 14")
-
 from src.experiments.experiment_design import create_experiment_design
-
-print(f"Line 18")
-
-
-
 from src.pipelines.setup_pipeline import SetupModel
 from src.utils.charts import vis_ts_predict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-WORKERS = 1
+WORKERS = 2
 
 EXPERIMENT_NAME = "prod"
 
@@ -35,8 +24,6 @@ experiment_path = os.path.join(export_path, EXPERIMENT_NAME)
 logger = get_logger(log_dir=experiment_path)
 result_path = os.path.join(experiment_path, "results")
 os.makedirs(result_path, exist_ok=True)
-
-print(f"Line 29")
 
 progress_setup_csv_path = os.path.join(experiment_path, "progress_setup.csv")
 os.makedirs(progress_setup_csv_path, exist_ok=True)
@@ -86,11 +73,6 @@ def run_setup(experiment):
         setups_pipeline.fetch_all_t2v_features()
         result, df_pred, df_test = setups_pipeline.run_setup_model()
 
-        print(df_pred)
-
-        print(f"path_to_save")
-        print(path_to_save)
-
         vis_ts_predict(
             df_pred=df_pred,
             df_test=df_test,
@@ -126,6 +108,30 @@ def run_setup(experiment):
         logger.error(e)
 
 
-for _, row_exp in df_to_setup.iterrows():
-    run_setup(experiment=row_exp)
+# for _, row_exp in df_to_setup.iterrows():
+#     run_setup(experiment=row_exp)
 
+if __name__ == "__main__":
+
+    experiments = [
+        row_exp.to_dict()
+        for _, row_exp in df_to_setup.iterrows()
+    ]
+
+    print(f"Experiments: {len(experiments)}")
+
+    with ThreadPoolExecutor(
+            max_workers=WORKERS
+    ) as executor:
+
+        futures = [
+            executor.submit(run_setup, exp)
+            for exp in experiments
+        ]
+
+        for future in tqdm(
+                as_completed(futures),
+                total=len(futures),
+                desc="Experiments"
+        ):
+            future.result()
