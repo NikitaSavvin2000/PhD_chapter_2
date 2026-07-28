@@ -7,6 +7,8 @@ from tqdm import tqdm
 from src.utils.logger import get_logger
 from src.utils.progresser import progress_loader, progress_writer, csv_writer
 from src.experiments.experiment_design import create_experiment_design
+
+print(f"Line 11")
 from src.pipelines.setup_pipeline import SetupModel
 from src.utils.charts import vis_ts_predict
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -24,6 +26,7 @@ logger = get_logger(log_dir=experiment_path)
 result_path = os.path.join(experiment_path, "results")
 os.makedirs(result_path, exist_ok=True)
 
+print(f"Line 29")
 
 progress_setup_csv_path = os.path.join(experiment_path, "progress_setup.csv")
 os.makedirs(progress_setup_csv_path, exist_ok=True)
@@ -31,6 +34,7 @@ os.makedirs(progress_setup_csv_path, exist_ok=True)
 df_setup = create_experiment_design(experiment_path=experiment_path)
 df_to_setup = progress_loader(df_experiment_design=df_setup, progress_csv_path=progress_setup_csv_path, logger=logger)
 
+print(f"Line 30")
 
 def run_setup(experiment):
     try:
@@ -111,31 +115,6 @@ def run_setup(experiment):
     except Exception as e:
         logger.error(e)
 
-#
-# if __name__ == "__main__":
-#
-#     experiments = [
-#         row_exp.to_dict()
-#         for _, row_exp in df_to_setup.iterrows()
-#     ]
-#
-#     print(f"Experiments: {len(experiments)}")
-#
-#     with ThreadPoolExecutor(
-#             max_workers=WORKERS
-#     ) as executor:
-#
-#         futures = [
-#             executor.submit(run_setup, exp)
-#             for exp in experiments
-#         ]
-#
-#         for future in tqdm(
-#                 as_completed(futures),
-#                 total=len(futures),
-#                 desc="Experiments"
-#         ):
-#             future.result()
 
 for _, row_exp in df_to_setup.iterrows():
     run_setup(experiment=row_exp)
