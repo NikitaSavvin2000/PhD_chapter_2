@@ -36,16 +36,11 @@ time_series_models_funcs = {
 home_path = os.getcwd()
 export_path = os.path.join(home_path, "export")
 
-# datasets_to_test = ["russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
-# models_to_exp = ["LSTM", "XGBoost",]
-datasets_to_test = ["russia_amur_region",]
-
-models_to_exp = ["LSTM",]
-
+datasets_to_test = ["russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
+models_to_exp = ["LSTM", "XGBoost",]
 
 list_predict_points_to_test = [144, 288, 576]
-# trajectories = ["baseline", "fourier"]
-trajectories = ["fourier"]
+trajectories = ["baseline", "fourier"]
 
 
 def create_experiment_design(experiment_path):

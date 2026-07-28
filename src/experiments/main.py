@@ -3,11 +3,13 @@ pdm run src/experiments/main.py
 """
 import os
 
+from tqdm import tqdm
 from src.utils.logger import get_logger
 from src.utils.progresser import progress_loader, progress_writer, csv_writer
 from src.experiments.experiment_design import create_experiment_design
 from src.pipelines.setup_pipeline import SetupModel
 from src.utils.charts import vis_ts_predict
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -115,6 +117,26 @@ def run_setup(experiment):
         logger.error(e)
 
 
-for _, row_exp in df_to_setup.iterrows():
-    run_setup(experiment=row_exp)
+if __name__ == "__main__":
 
+    experiments = [
+        row_exp.to_dict()
+        for _, row_exp in df_to_setup.iterrows()
+    ]
+
+    with ProcessPoolExecutor(max_workers=WORKERS) as executor:
+
+        futures = [
+            executor.submit(run_setup, exp)
+            for exp in experiments
+        ]
+
+        for future in tqdm(
+                as_completed(futures),
+                total=len(futures),
+                desc="Experiments"
+        ):
+            future.result()
+
+# for _, row_exp in df_to_setup.iterrows():
+#     run_setup(experiment=row_exp)
