@@ -21,16 +21,16 @@ from src.ts_models.lstm_service.lstm_pred import LSTM_forecast
 time_series_models_funcs = {
     "LSTM": LSTM_forecast,
     "XGBoost": XGBoost_forecast,
-    "CatBoost": CatBoost_forecast,
-    "LightGBM": LightGBM_forecast,
-    "LinearRegression": LinearRegression_forecast,
-    "RandomForest": RandomForest_forecast,
-    "SVR": SVR_forecast,
-    "Prophet": Prophet_forecast,
-    "DLinear": DLinear_forecast,
-    "TCN": TCN_forecast,
-    "Transformer": Transformer_forecast,
-    "NHiTS": NHiTS_forecast,
+    # "CatBoost": CatBoost_forecast,
+    # "LightGBM": LightGBM_forecast,
+    # "LinearRegression": LinearRegression_forecast,
+    # "RandomForest": RandomForest_forecast,
+    # "SVR": SVR_forecast,
+    # "Prophet": Prophet_forecast,
+    # "DLinear": DLinear_forecast,
+    # "TCN": TCN_forecast,
+    # "Transformer": Transformer_forecast,
+    # "NHiTS": NHiTS_forecast,
 }
 
 home_path = os.getcwd()
