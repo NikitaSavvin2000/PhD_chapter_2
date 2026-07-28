@@ -18,7 +18,7 @@ from src.experiments.experiment_design import create_experiment_design
 print(f"Line 18")
 
 
-print(f"Line 11")
+
 from src.pipelines.setup_pipeline import SetupModel
 from src.utils.charts import vis_ts_predict
 from concurrent.futures import ThreadPoolExecutor, as_completed

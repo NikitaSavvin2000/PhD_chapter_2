@@ -5,18 +5,18 @@ import os
 import pandas as pd
 
 from src.data.data_config import datasets_csv_dict
-from src.ts_models.catboost_service.catboost_pred import CatBoost_forecast
-from src.ts_models.lightgbm_service.lightgbm_pred import LightGBM_forecast
+# from src.ts_models.catboost_service.catboost_pred import CatBoost_forecast
+# from src.ts_models.lightgbm_service.lightgbm_pred import LightGBM_forecast
 from src.ts_models.xgboost_service.xgboost_pred import XGBoost_forecast
-from src.ts_models.lr_service.lr_pred import LinearRegression_forecast
+# from src.ts_models.lr_service.lr_pred import LinearRegression_forecast
 from src.ts_models.lstm_service.lstm_pred import LSTM_forecast
-from src.ts_models.prophet_service.prophet_pred import Prophet_forecast
-from src.ts_models.rf_service.rf_pred import RandomForest_forecast
-from src.ts_models.svr_service.svr_pred import SVR_forecast
-from src.ts_models.DLinear_service.DLinear_pred import DLinear_forecast
-from src.ts_models.TCN_service.TCN_pred import TCN_forecast
-from src.ts_models.Transformer_service.Transformer_pred import Transformer_forecast
-from src.ts_models.NHiTS_service.NHiTS_pred import NHiTS_forecast
+# from src.ts_models.prophet_service.prophet_pred import Prophet_forecast
+# from src.ts_models.rf_service.rf_pred import RandomForest_forecast
+# from src.ts_models.svr_service.svr_pred import SVR_forecast
+# from src.ts_models.DLinear_service.DLinear_pred import DLinear_forecast
+# from src.ts_models.TCN_service.TCN_pred import TCN_forecast
+# from src.ts_models.Transformer_service.Transformer_pred import Transformer_forecast
+# from src.ts_models.NHiTS_service.NHiTS_pred import NHiTS_forecast
 
 time_series_models_funcs = {
     "LSTM": LSTM_forecast,
