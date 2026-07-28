@@ -5,9 +5,18 @@ print(f"Line 4")
 import os
 
 from tqdm import tqdm
+print(f"Line 8")
+
 from src.utils.logger import get_logger
+print(f"Line 11")
+
 from src.utils.progresser import progress_loader, progress_writer, csv_writer
+print(f"Line 14")
+
 from src.experiments.experiment_design import create_experiment_design
+
+print(f"Line 18")
+
 
 print(f"Line 11")
 from src.pipelines.setup_pipeline import SetupModel
