@@ -1,10 +1,10 @@
 import os
 import pandas as pd
 
-def progress_writer(experiment_row, experiment_path):
+def progress_writer(experiment_row, experiment_path, progress_name):
     os.makedirs(experiment_path, exist_ok=True)
 
-    progress_csv_path = os.path.join(experiment_path, "progress.csv")
+    progress_csv_path = os.path.join(experiment_path, f"{progress_name}.csv")
 
     df_row = pd.DataFrame([experiment_row])
 
@@ -17,6 +17,22 @@ def progress_writer(experiment_row, experiment_path):
         index=False
     )
 
+def csv_writer(df, save_path, file_name):
+    os.makedirs(save_path, exist_ok=True)
+
+    csv_path = os.path.join(
+        save_path,
+        f"{file_name}.csv"
+    )
+
+    file_exists = os.path.exists(csv_path)
+
+    df.to_csv(
+        csv_path,
+        mode="a",
+        header=not file_exists,
+        index=False
+    )
 
 def progress_loader(df_experiment_design, progress_csv_path, logger):
     df_design = df_experiment_design.copy().reset_index(drop=True)

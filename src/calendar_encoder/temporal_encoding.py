@@ -92,7 +92,6 @@ class Time2Vec:
                 (df_with_meta.index - df_with_meta.index.min()).total_seconds()
                 / (df_with_meta.index.max() - df_with_meta.index.min()).total_seconds()
         )
-        df_with_meta['fourier_time'] = np.abs(fft(df_with_meta['hour_sin'].astype(float).to_numpy()))
 
         return df_with_meta
 
@@ -137,7 +136,6 @@ class Time2Vec:
             "quarter_cos",
             "moon_phase",
             "time_trend",
-            "fourier_time"
         ]
 
         diff_cols = list(all_col.difference(col_vec))
@@ -175,7 +173,6 @@ class Time2Vec:
             quarter_cos = date["quarter_cos"]
             moon_phase = date["moon_phase"]
             time_trend = date["time_trend"]
-            fourier_time = date["fourier_time"]
 
             normalized_date = [
                                   time, date[self.col_target], year_norm, month_norm, day_norm, week_norm, day_of_week_norm,
@@ -183,7 +180,7 @@ class Time2Vec:
                                   date['hour_sin'], date['hour_cos'], date['day_of_week_sin'], date['day_of_week_cos'],
                                   date['week_sin'], date['week_cos'], date['month_sin'], date['month_cos'],
                                   part_of_day_norm, is_night_norm, is_weekend_norm, day_of_year_norm, is_working_hours,
-                                  season, season_sin, season_cos, quarter, quarter_sin, quarter_cos, moon_phase, time_trend, fourier_time
+                                  season, season_sin, season_cos, quarter, quarter_sin, quarter_cos, moon_phase, time_trend
                               ] + diff_col_values
             normalized_dates.append(normalized_date)
 

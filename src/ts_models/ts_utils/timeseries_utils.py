@@ -503,7 +503,7 @@ def assign_end_train_start_test_date(
 
 
 
-def select_pacf_lag(df, col_target, col_time=None, max_lag=10, logger=None):
+def select_pacf_lag(df, col_target, col_time=None, max_lag=100, logger=None):
     print(f"max_lag = {max_lag}")
 
     if logger is None:

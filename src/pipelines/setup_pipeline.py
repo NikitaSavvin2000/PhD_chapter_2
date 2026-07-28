@@ -1,7 +1,11 @@
 import os
 import pandas as pd
+import optuna
+
 
 from src.calendar_encoder.temporal_encoding import Time2Vec
+from src.calendar_encoder.fourier_encoding import add_fourier_features
+
 from src.ts_models.time_series_split import split_train_test
 from src.experiments.experiment_design import time_series_models_funcs
 from src.ts_models.ts_utils.timeseries_utils import (regression_metrics,
@@ -12,8 +16,8 @@ from src.ts_models.ts_utils.timeseries_utils import (regression_metrics,
                                                      )
 
 from src.ts_models.grids import models_grids
-import optuna
 
+from sklearn.preprocessing import MinMaxScaler
 
 
 class SetupModel:
@@ -26,6 +30,7 @@ class SetupModel:
             col_time,
             col_target,
             csv_link,
+            trajectory,
     ):
         """
         RU: Инициализация пайплайна эксперимента (без инфраструктуры)
@@ -37,12 +42,13 @@ class SetupModel:
         self.col_time = col_time
         self.col_target = col_target
         self.predict_points = test_points
+        self.trajectory = trajectory
 
         self.logger = logger
         self.test_points=test_points
         self.df_experiment_design = None
         self.df_init = None
-        self.df_t2v = None
+        self.df_features = None
         self.df_train = None
         self.df_test = None
         self.pacf_lag = 1
@@ -56,6 +62,7 @@ class SetupModel:
         EN: Load dataset
         ZH: 加载数据集
         """
+
         try:
 
             self.cols_to_select = [self.col_time, self.col_target]
@@ -64,6 +71,13 @@ class SetupModel:
             self.df_init = self.df_init.drop_duplicates(subset=[self.col_time], keep="first")
             self.existing_cols = [c for c in self.cols_to_select if c in self.df_init.columns]
             self.df_init = self.df_init[self.existing_cols]
+
+            scaler = MinMaxScaler()
+
+            self.df_init[self.col_target] = scaler.fit_transform(
+                self.df_init[[self.col_target]]
+            )
+
             self.last_known_data = pd.to_datetime(self.df_init[self.col_time]).max()
             self.first_known_data = pd.to_datetime(self.df_init[self.col_time]).min()
             self.discreteness_sec = calculate_discreteness_interval(df=self.df_init, time_column=self.col_time)
@@ -107,23 +121,54 @@ class SetupModel:
             raise e
         return self
 
-    def run_time2vec(self):
+    def generate_features(self):
         """
         RU: Time2Vec кодирование временного ряда
         EN: Time2Vec encoding
         ZH: Time2Vec 编码
         """
 
-        try:
-            t2v = Time2Vec(col_time=self.col_time, col_target=self.col_target)
-            self.df_t2v, self.min_val, self.max_val = t2v.encoder(df=self.df_init)
-            self.df_real_pred_t2v, _, _ = t2v.encoder(df=self.df_real_pred)
+        if self.trajectory == "baseline" or self.trajectory == "t2v" or self.trajectory == "time2vec":
+            try:
+                t2v = Time2Vec(col_time=self.col_time, col_target=self.col_target)
+                self.df_features, self.min_val, self.max_val = t2v.encoder(df=self.df_init)
 
-        except Exception as e:
-            self.logger.error(f" Func run_time2vec | Model - {self.model} | Points - { self.test_points} | {e}")
+                # self.df_real_pred_features, _, _ = t2v.encoder(df=self.df_real_pred)
 
-            raise e
+                self.col_for_train = [
+                    "year",
+                    "month",
+                    "day",
+                    "hour",
+                    "minute",
+                    "second",
+                ]
 
+            except Exception as e:
+                self.logger.error(f" Func run_time2vec | Model - {self.model} | Points - { self.test_points} | {e}")
+
+                raise e
+
+        elif self.trajectory == "fourier":
+            try:
+                self.df_features, self.col_for_train = add_fourier_features(
+                    df=self.df_init,
+                    time_column=self.col_time,
+                    target_column=self.col_target
+                )
+                # self.df_real_pred_features, _ = add_fourier_features(
+                #     df=self.df_real_pred,
+                #     time_column=self.col_time,
+                #     target_column=self.col_target
+                # )
+
+            except Exception as e:
+                self.logger.error(f" Func фурье | Model - {self.model} | Points - { self.test_points} | {e}")
+
+                raise e
+
+        else:
+            raise "Неизвестная траектория"
         return self
 
 
@@ -134,9 +179,8 @@ class SetupModel:
         ZH: 训练/测试划分
         """
         try:
-            print(self.df_t2v)
             self.df_train, self.df_test = split_train_test(
-                df=self.df_t2v,
+                df=self.df_features,
                 start_train_date=self.start_train_date,
                 end_train_date=self.end_train_date,
                 start_test_date=self.start_test_date,
@@ -160,7 +204,7 @@ class SetupModel:
         excluded = [self.col_time, self.col_target]
 
         self.all_t2v_cols = [
-            col for col in self.df_t2v.columns
+            col for col in self.df_features.columns
             if col not in excluded
         ]
 
@@ -175,7 +219,7 @@ class SetupModel:
         """
         try:
             self.pacf_lag = select_pacf_lag(
-                df=self.df_t2v,
+                df=self.df_features,
                 col_target=self.col_target,
                 col_time=self.col_time,
                 logger=self.logger
@@ -186,6 +230,7 @@ class SetupModel:
             raise e
 
         return self.pacf_lag
+
 
     def _objective(self, trial):
         grid = models_grids[self.model]
@@ -232,7 +277,6 @@ class SetupModel:
         trial.set_user_attr("pred", pred)
 
         return score
-
 
 
     def run_lag_pacf(self):
@@ -243,7 +287,7 @@ class SetupModel:
         """
         try:
             self.pacf_lag = select_pacf_lag(
-                df=self.df_t2v,
+                df=self.df_features,
                 col_target=self.col_target,
                 col_time=self.col_time,
                 logger=self.logger
@@ -301,16 +345,8 @@ class SetupModel:
 
         return score
 
-    def run_setup_model(self, n_trials=1):
+    def run_setup_model(self, n_trials=50):
         try:
-            self.col_for_train = [
-                "year",
-                "month",
-                "day",
-                "hour",
-                "minute",
-                "second",
-            ]
 
             self.lag = self.run_lag_pacf()
             self.forecast_func = time_series_models_funcs[self.model]

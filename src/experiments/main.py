@@ -4,7 +4,7 @@ pdm run src/experiments/main.py
 import os
 
 from src.utils.logger import get_logger
-from src.utils.progresser import progress_loader, progress_writer
+from src.utils.progresser import progress_loader, progress_writer, csv_writer
 from src.experiments.experiment_design import create_experiment_design
 from src.pipelines.setup_pipeline import SetupModel
 from src.utils.charts import vis_ts_predict
@@ -17,7 +17,7 @@ os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
 WORKERS = 12
 
-EXPERIMENT_NAME = "prod_33"
+EXPERIMENT_NAME = "prod_35"
 
 home = os.getcwd()
 export_path = os.path.join(home, "export")
@@ -27,13 +27,13 @@ logger = get_logger(log_dir=experiment_path)
 result_path = os.path.join(experiment_path, "results")
 os.makedirs(result_path, exist_ok=True)
 
+
 progress_setup_csv_path = os.path.join(experiment_path, "progress_setup.csv")
 os.makedirs(progress_setup_csv_path, exist_ok=True)
 
 df_setup = create_experiment_design(experiment_path=experiment_path)
 df_to_setup = progress_loader(df_experiment_design=df_setup, progress_csv_path=progress_setup_csv_path, logger=logger)
 
-print(df_to_setup)
 
 def run_setup(experiment):
     try:
@@ -44,6 +44,7 @@ def run_setup(experiment):
         path_to_save = experiment["path_to_save"]
         col_time = experiment["col_time"]
         col_target = experiment["col_target"]
+        trajectory = experiment["trajectory"]
 
         path_to_save = os.path.join(result_path, path_to_save)
         os.makedirs(path_to_save, exist_ok=True)
@@ -62,12 +63,13 @@ def run_setup(experiment):
             col_time=col_time,
             col_target=col_target,
             csv_link=csv_link,
+            trajectory=trajectory,
 
         )
         setups_pipeline.load_dataset()
         setups_pipeline.prepare_future_dataframe()
 
-        setups_pipeline.run_time2vec()
+        setups_pipeline.generate_features()
 
         setups_pipeline.run_split()
         setups_pipeline.fetch_all_t2v_features()
@@ -85,6 +87,7 @@ def run_setup(experiment):
             col_target=col_target,
             model=model,
             dataset_name=dataset_name,
+            trajectory=trajectory,
             path_to_save=path_to_save
         )
 
@@ -96,8 +99,17 @@ def run_setup(experiment):
             "best_metrics": setups_pipeline.best_metrics
         }
 
+        row_metrics = setups_pipeline.best_metrics
+
+        csv_writer(df=df_pred, save_path=path_to_save, file_name="pred")
+        csv_writer(df=df_test, save_path=path_to_save, file_name="true")
+
+        progress_writer(experiment_row=row_metrics, experiment_path=path_to_save, progress_name="metrics")
+
         progress_writer(experiment_row=row_params, experiment_path=path_to_save, progress_name="setups_params")
         progress_writer(experiment_row=experiment, experiment_path=experiment_path, progress_name="progress_setup")
+
+
 
     except Exception as e:
         logger.error(e)

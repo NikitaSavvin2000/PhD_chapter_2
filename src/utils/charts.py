@@ -1,8 +1,8 @@
 import os
-import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
+
 from src.ts_models.ts_utils.timeseries_utils import regression_metrics
+
 
 def vis_ts_predict(
         df_pred,
@@ -11,11 +11,9 @@ def vis_ts_predict(
         col_target,
         model,
         dataset_name,
+        trajectory,
         path_to_save,
 ):
-    import os
-    import pandas as pd
-    import matplotlib.pyplot as plt
 
     os.makedirs(path_to_save, exist_ok=True)
 
@@ -37,7 +35,7 @@ def vis_ts_predict(
 
     translations = {
         "ru": {
-            "title": f"Датасет: {dataset_name}\nМодель: {model}. Точек прогноза: {len(df_pred)}",
+            "title": f"Датасет: {dataset_name}. Модель: {model}. Признаки: {trajectory}. Точек прогноза: {len(df_pred)}.",
             "real": "Реальные значения",
             "pred": "Предсказание",
             "x": "Время",
@@ -45,7 +43,7 @@ def vis_ts_predict(
             "suffix": "ru",
         },
         "en": {
-            "title": f"Dataset: {dataset_name}\nModel: {model}. Forecast points: {len(df_pred)}",
+            "title": f"Dataset: {dataset_name}. Model: {model}. Features: {trajectory}. Forecast points: {len(df_pred)}.",
             "real": "Actual values",
             "pred": "Prediction",
             "x": "Time",

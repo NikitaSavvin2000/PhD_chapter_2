@@ -1,12 +1,13 @@
 
 lstm_grid = {
-    "lstm_units": [32, 64],
-    "activation": ["swish"],
-    "recurrent_dropout_rate": [0.0, 0.2],
-    "regularizers_l2": [1e-3],
+    "lstm_units": [64, 128],
+    "num_layers": [1, 2],
+    "dropout_rate": [0.1, 0.2],
+    "regularizers_l2": [1e-4],
     "optimizer": ["adam"],
-    "batch_size": [32],
-    "epochs": [2, 3, 5]
+    "learning_rate": [1e-3, 5e-4],
+    "batch_size": [64],
+    "epochs": [30]
 }
 
 nhits_grid = {
@@ -21,8 +22,8 @@ nhits_grid = {
 }
 
 xgb_grid = {
-    "max_depth": [3, 5],
-    "n_estimators": [500, 1000],
+    "max_depth": [5, 8],
+    "n_estimators": [1500, 2500],
     "subsample": [0.8, 1.0],
     "colsample_bytree": [0.8, 1.0],
     "min_child_weight": [3, 7],

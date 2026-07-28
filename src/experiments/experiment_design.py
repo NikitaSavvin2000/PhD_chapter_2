@@ -36,12 +36,17 @@ time_series_models_funcs = {
 home_path = os.getcwd()
 export_path = os.path.join(home_path, "export")
 
-datasets_to_test = ["russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
-# models_to_exp = ["LSTM", "XGBoost", "LightGBM"]
-models_to_exp = ["XGBoost",]
+# datasets_to_test = ["russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
+# models_to_exp = ["LSTM", "XGBoost",]
+datasets_to_test = ["russia_amur_region",]
+
+models_to_exp = ["LSTM",]
+
 
 list_predict_points_to_test = [144, 288, 576]
-trajectories = ["baseline", "t2v"]
+# trajectories = ["baseline", "fourier"]
+trajectories = ["fourier"]
+
 
 def create_experiment_design(experiment_path):
     rows = []
@@ -51,21 +56,24 @@ def create_experiment_design(experiment_path):
         col_target = datasets_csv_dict[dataset]["col_target"]
         for model in models_to_exp:
             for points in list_predict_points_to_test:
-                path_to_save = os.path.join(
-                    experiment_path,
-                    "results",
-                    dataset,
-                    model,
-                    str(points)
-                )
-                rows.append({
-                    "dataset": dataset,
-                    "model": model,
-                    "csv_link": csv,
-                    "col_time": col_time,
-                    "col_target": col_target,
-                    "path_to_save": path_to_save,
-                    "points_to_pred": points
-                    })
+                for trajectory in trajectories:
+                    path_to_save = os.path.join(
+                        experiment_path,
+                        "results",
+                        dataset,
+                        model,
+                        str(points),
+                        trajectory
+                    )
+                    rows.append({
+                        "dataset": dataset,
+                        "model": model,
+                        "csv_link": csv,
+                        "col_time": col_time,
+                        "col_target": col_target,
+                        "path_to_save": path_to_save,
+                        "points_to_pred": points,
+                        "trajectory": trajectory
+                        })
 
     return pd.DataFrame(rows)
