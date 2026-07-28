@@ -10,9 +10,6 @@ os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
-import tensorflow as tf
-
-tf.config.set_visible_devices([], "GPU")
 
 from tqdm import tqdm
 from src.utils.logger import get_logger
@@ -25,6 +22,10 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
 WORKERS = 1
+
+def init_worker():
+    import tensorflow as tf
+    tf.config.set_visible_devices([], "GPU")
 
 EXPERIMENT_NAME = "prod_35"
 
@@ -133,7 +134,10 @@ if __name__ == "__main__":
 
     print(f"Experiments: {len(experiments)}")
 
-    with ProcessPoolExecutor(max_workers=WORKERS) as executor:
+    with ProcessPoolExecutor(
+            max_workers=WORKERS,
+            initializer=init_worker
+    ) as executor:
 
         futures = [
             executor.submit(run_setup, exp)
