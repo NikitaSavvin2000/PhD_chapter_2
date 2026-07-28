@@ -17,7 +17,7 @@ os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
-WORKERS = 12
+WORKERS = 1
 
 EXPERIMENT_NAME = "prod_35"
 
@@ -123,6 +123,8 @@ if __name__ == "__main__":
         row_exp.to_dict()
         for _, row_exp in df_to_setup.iterrows()
     ]
+
+    print(f"Experiments: {len(experiments)}")
 
     with ProcessPoolExecutor(max_workers=WORKERS) as executor:
 
