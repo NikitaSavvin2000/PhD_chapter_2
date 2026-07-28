@@ -17,17 +17,12 @@ from src.utils.progresser import progress_loader, progress_writer, csv_writer
 from src.experiments.experiment_design import create_experiment_design
 from src.pipelines.setup_pipeline import SetupModel
 from src.utils.charts import vis_ts_predict
-from concurrent.futures import ProcessPoolExecutor, as_completed
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 WORKERS = 1
 
-def init_worker():
-    import tensorflow as tf
-    tf.config.set_visible_devices([], "GPU")
-
-EXPERIMENT_NAME = "prod_35"
+EXPERIMENT_NAME = "prod"
 
 home = os.getcwd()
 export_path = os.path.join(home, "export")
@@ -134,9 +129,8 @@ if __name__ == "__main__":
 
     print(f"Experiments: {len(experiments)}")
 
-    with ProcessPoolExecutor(
-            max_workers=WORKERS,
-            initializer=init_worker
+    with ThreadPoolExecutor(
+            max_workers=WORKERS
     ) as executor:
 
         futures = [
