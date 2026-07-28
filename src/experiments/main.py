@@ -10,6 +10,10 @@ os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
+import tensorflow as tf
+
+tf.config.set_visible_devices([], "GPU")
+
 from tqdm import tqdm
 from src.utils.logger import get_logger
 from src.utils.progresser import progress_loader, progress_writer, csv_writer
