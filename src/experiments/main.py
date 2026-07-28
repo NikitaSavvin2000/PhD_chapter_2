@@ -1,6 +1,7 @@
 """
 pdm run src/experiments/main.py
 """
+print(f"Line 4")
 import os
 
 from tqdm import tqdm
