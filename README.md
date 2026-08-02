@@ -26,3 +26,8 @@ source .venv/bin/activate
 ```bash
 pdm run src/experiments/main.py
 ```
+
+
+Методология 
+
+1 настройка параметров модели через оптюна для фурье и бейзлайна 

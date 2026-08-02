@@ -2,31 +2,25 @@
 pdm run src/experiments/main.py
 """
 import os
-import pandas as pd
+
 from tqdm import tqdm
-import ast
 
 from src.utils.logger import get_logger
 from src.utils.progresser import progress_loader, progress_writer, csv_writer
-from src.experiments.main_design import create_experiment_design
-from src.pipelines.ts_pipeline import RunModel
+from src.experiments.experiment_design import create_experiment_design
+from src.pipelines.setup_pipeline import SetupModel
 from src.utils.charts import vis_ts_predict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-WORKERS = 1
+WORKERS = 12
 
 EXPERIMENT_NAME = "prod"
-SETUP_DIR_NAME = "prod"
-
 
 home = os.getcwd()
 export_path = os.path.join(home, "export")
 os.makedirs(export_path, exist_ok=True)
 experiment_path = os.path.join(export_path, EXPERIMENT_NAME)
-setup_path = os.path.join(export_path, SETUP_DIR_NAME)
-
-
 logger = get_logger(log_dir=experiment_path)
 result_path = os.path.join(experiment_path, "results")
 os.makedirs(result_path, exist_ok=True)
@@ -36,28 +30,6 @@ os.makedirs(progress_setup_csv_path, exist_ok=True)
 
 df_setup = create_experiment_design(experiment_path=experiment_path)
 df_to_setup = progress_loader(df_experiment_design=df_setup, progress_csv_path=progress_setup_csv_path, logger=logger)
-
-print(f"Line 30")
-
-
-def read_params(setup_path, dataset_name, model, points_to_pred):
-
-    csv_params = os.path.join(
-        setup_path,
-        "results",
-        dataset_name,
-        model,
-        str(points_to_pred),
-        "baseline",
-        "setups_params.csv",
-    )
-    df_params = pd.read_csv(csv_params)
-    lag = int(df_params.iloc[0]["lag"])
-    params = df_params.iloc[0]["best_params"]
-    if isinstance(params, str):
-        params = ast.literal_eval(params)
-
-    return lag, params
 
 
 def run_setup(experiment):
@@ -70,8 +42,6 @@ def run_setup(experiment):
         col_time = experiment["col_time"]
         col_target = experiment["col_target"]
         trajectory = experiment["trajectory"]
-        points_to_pred = experiment["points_to_pred"]
-
 
         path_to_save = os.path.join(result_path, path_to_save)
         os.makedirs(path_to_save, exist_ok=True)
@@ -80,15 +50,10 @@ def run_setup(experiment):
         # en: Initialize experiment pipeline instance
         # ru: Инициализация экземпляра пайплайна эксперимента
         # ============================================
+        points_to_pred = experiment["points_to_pred"]
 
-        lag, params = read_params(
-            setup_path=setup_path,
-            dataset_name=dataset_name,
-            model=model,
-            points_to_pred=points_to_pred
-        )
-
-        setups_pipeline = RunModel(
+        setups_pipeline = SetupModel(
+            experiment=experiment,
             logger=logger,
             test_points=points_to_pred,
             model=model,
@@ -96,8 +61,7 @@ def run_setup(experiment):
             col_target=col_target,
             csv_link=csv_link,
             trajectory=trajectory,
-            lag=lag,
-            params=params
+
         )
         setups_pipeline.load_dataset()
         setups_pipeline.prepare_future_dataframe()
@@ -106,7 +70,7 @@ def run_setup(experiment):
 
         setups_pipeline.run_split()
         setups_pipeline.fetch_all_t2v_features()
-        metrics, df_pred, df_test = setups_pipeline.run_model()
+        result, df_pred, df_test = setups_pipeline.run_setup_model()
 
         vis_ts_predict(
             df_pred=df_pred,
@@ -120,28 +84,31 @@ def run_setup(experiment):
         )
 
         row_params = {
-            "lag": lag,
+            "lag": setups_pipeline.best_lag,
             "model": experiment["model"],
             "dataset_name": dataset_name,
-            "best_params": params,
-            "best_metrics": metrics
+            "best_params": setups_pipeline.best_params,
+            "best_metrics": setups_pipeline.best_metrics
         }
 
-        print(f"СОХРАНЯЕМ {model} | {dataset_name} | {points_to_pred}")
+        row_metrics = setups_pipeline.best_metrics
+
         csv_writer(df=df_pred, save_path=path_to_save, file_name="pred")
         csv_writer(df=df_test, save_path=path_to_save, file_name="true")
 
-        progress_writer(experiment_row=metrics, experiment_path=path_to_save, progress_name="metrics")
+        progress_writer(experiment_row=row_metrics, experiment_path=path_to_save, progress_name="metrics")
 
         progress_writer(experiment_row=row_params, experiment_path=path_to_save, progress_name="setups_params")
         progress_writer(experiment_row=experiment, experiment_path=experiment_path, progress_name="progress_setup")
+
+
 
     except Exception as e:
         logger.error(e)
 
 
-# for _, row_exp in df_to_setup.iterrows():
-#     run_setup(experiment=row_exp)
+for _, row_exp in df_to_setup.iterrows():
+    run_setup(experiment=row_exp)
 
 if __name__ == "__main__":
 
