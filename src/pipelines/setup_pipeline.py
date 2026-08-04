@@ -7,7 +7,7 @@ from src.calendar_encoder.temporal_encoding import Time2Vec
 from src.calendar_encoder.fourier_encoding import add_fourier_features
 
 from src.ts_models.time_series_split import split_train_test
-from src.experiments.experiment_design import time_series_models_funcs
+from src.experiments.setup_design import time_series_models_funcs
 from src.ts_models.ts_utils.timeseries_utils import (regression_metrics,
                                                      calculate_discreteness_interval,
                                                      generate_time_series_df,

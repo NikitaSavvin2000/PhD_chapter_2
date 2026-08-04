@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from src.utils.logger import get_logger
 from src.utils.progresser import progress_loader, progress_writer, csv_writer
-from src.experiments.experiment_design import create_experiment_design
+from src.experiments.setup_design import create_experiment_design
 from src.pipelines.setup_pipeline import SetupModel
 from src.utils.charts import vis_ts_predict
 from concurrent.futures import ThreadPoolExecutor, as_completed
