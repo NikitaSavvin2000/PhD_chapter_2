@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WORKERS = 12
 
-EXPERIMENT_NAME = "prod"
+EXPERIMENT_NAME = "prod1"
 SETUP_DIR_NAME = "prod"
 
 
@@ -127,6 +127,8 @@ def run_setup(experiment):
             "best_metrics": metrics
         }
 
+        print(metrics)
+
         print(f"СОХРАНЯЕМ {model} | {dataset_name} | {points_to_pred}")
         csv_writer(df=df_pred, save_path=path_to_save, file_name="pred")
         csv_writer(df=df_test, save_path=path_to_save, file_name="true")
@@ -140,30 +142,30 @@ def run_setup(experiment):
         logger.error(e)
 
 
-# for _, row_exp in df_to_setup.iterrows():
-#     run_setup(experiment=row_exp)
+for _, row_exp in df_to_setup.iterrows():
+    run_setup(experiment=row_exp)
 
-if __name__ == "__main__":
-
-    experiments = [
-        row_exp.to_dict()
-        for _, row_exp in df_to_setup.iterrows()
-    ]
-
-    print(f"Experiments: {len(experiments)}")
-
-    with ThreadPoolExecutor(
-            max_workers=WORKERS
-    ) as executor:
-
-        futures = [
-            executor.submit(run_setup, exp)
-            for exp in experiments
-        ]
-
-        for future in tqdm(
-                as_completed(futures),
-                total=len(futures),
-                desc="Experiments"
-        ):
-            future.result()
+# if __name__ == "__main__":
+#
+#     experiments = [
+#         row_exp.to_dict()
+#         for _, row_exp in df_to_setup.iterrows()
+#     ]
+#
+#     print(f"Experiments: {len(experiments)}")
+#
+#     with ThreadPoolExecutor(
+#             max_workers=WORKERS
+#     ) as executor:
+#
+#         futures = [
+#             executor.submit(run_setup, exp)
+#             for exp in experiments
+#         ]
+#
+#         for future in tqdm(
+#                 as_completed(futures),
+#                 total=len(futures),
+#                 desc="Experiments"
+#         ):
+#             future.result()

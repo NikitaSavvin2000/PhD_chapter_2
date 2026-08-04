@@ -5,22 +5,10 @@ from xgboost import XGBRegressor
 from src.ts_models.ts_utils.timeseries_utils import (
     split_sequence,
     create_x_input,
-    make_predictions
+    make_predictions,
 )
 
-# DEFAULT_XGB_PARAMS = {
-#     "max_depth": 3,
-#     "n_estimators": 1000,
-#     "subsample": 1.0,
-#     "colsample_bytree": 1.0,
-#     "min_child_weight": 7,
-#     "gamma": 0.0,
-#     # "reg_lambda": 1.0,
-#     "reg_alpha": 0.0,
-#     "booster": "gbtree"
-# }
-
-DEFAULT_XGB_PARAMS = {'max_depth': 5, 'n_estimators': 500, 'subsample': 1.0, 'colsample_bytree': 0.8, 'min_child_weight': 7, 'gamma': 0.0, 'reg_alpha': 0.0, 'booster': 'gbtree'}
+DEFAULT_XGB_PARAMS = {'max_depth': 4, 'n_estimators': 500, 'subsample': 1.0, 'colsample_bytree': 0.8, 'min_child_weight': 7, 'gamma': 0.0, 'reg_alpha': 0.0, 'booster': 'gbtree'}
 
 def XGBoost_forecast(
         col_target,

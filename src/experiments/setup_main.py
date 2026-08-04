@@ -1,5 +1,5 @@
 """
-pdm run src/experiments/main.py
+pdm run src/experiments/setup_main.py
 """
 import os
 
@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WORKERS = 12
 
-EXPERIMENT_NAME = "prod"
+EXPERIMENT_NAME = "prod_2"
 
 home = os.getcwd()
 export_path = os.path.join(home, "export")

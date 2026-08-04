@@ -42,6 +42,122 @@ def split_sequence(sequence, n_steps):
     return np.array(X), np.array(y)
 
 
+import numpy as np
+
+
+def split_sequence_04_08_26(sequence: np.ndarray, lag: int):
+    """
+    Формирует выборку вида
+
+    X =
+        [target(t-lag+1)...target(t), future_features(t+1)]
+
+    y =
+        target(t+1)
+
+    Parameters
+    ----------
+    sequence : ndarray
+        Первый столбец — target.
+        Остальные — признаки времени.
+
+    lag : int
+        Количество лагов target.
+
+    Returns
+    -------
+    X : ndarray
+    y : ndarray
+    """
+
+    X = []
+    y = []
+
+    target = sequence[:, 0]
+    future_features = sequence[:, 1:]
+
+    for i in range(len(sequence) - lag):
+
+        target_history = target[i:i + lag]
+
+        next_features = future_features[i + lag]
+
+        x = np.concatenate(
+            [
+                target_history,
+                next_features,
+            ]
+        )
+
+        X.append(x)
+        y.append(target[i + lag])
+
+    return np.asarray(X, dtype=np.float32), np.asarray(y, dtype=np.float32)
+
+
+def create_x_input_04_08_26(df_train, n_steps):
+    """
+    Create the initial target history for autoregressive forecasting.
+
+    Parameters:
+        df_train (pd.DataFrame): Training data. The first column must be the target.
+        n_steps (int): Number of target lags.
+
+    Returns:
+        np.ndarray: Array of shape (n_steps, 1) containing the latest target values.
+    """
+
+    return (
+        df_train
+        .iloc[-n_steps:, 0]
+        .to_numpy(dtype=np.float32)
+        .reshape(n_steps, 1)
+    )
+
+def make_predictions_04_08_26(
+        x_input,
+        x_future,
+        n_features,
+        model,
+        lag,
+        count_pred_points,
+):
+    """
+    x_input:
+        shape = (1, lag, 1)
+        содержит только последние lag значений target
+
+    x_future:
+        shape = (N, 1 + future_features)
+
+        первый столбец = target (не используется)
+        остальные = признаки будущего момента времени
+    """
+
+    predict_values = []
+
+    target_history = x_input.reshape(-1).astype(np.float32)
+
+    for i in range(count_pred_points):
+
+        future_features = x_future[i, 1:].astype(np.float32)
+
+        model_input = np.concatenate(
+            [
+                target_history,
+                future_features,
+            ]
+        ).reshape(1, -1)
+
+        y_predict = float(model.predict(model_input)[0])
+
+        predict_values.append(y_predict)
+
+        target_history = np.roll(target_history, -1)
+        target_history[-1] = y_predict
+
+    return predict_values
+
 def create_x_input(df_train, n_steps):
     """
     Create the input array for predictions from the training DataFrame.

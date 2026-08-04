@@ -4,7 +4,7 @@ from src.calendar_encoder.temporal_encoding import Time2Vec
 from src.calendar_encoder.fourier_encoding import add_fourier_features
 
 from src.ts_models.time_series_split import split_train_test
-from src.experiments.experiment_design import time_series_models_funcs
+from src.experiments.main_design import time_series_models_funcs
 from src.ts_models.ts_utils.timeseries_utils import (regression_metrics,
                                                      calculate_discreteness_interval,
                                                      generate_time_series_df,
@@ -64,8 +64,22 @@ class RunModel:
 
             self.cols_to_select = [self.col_time, self.col_target]
             self.df_init = pd.read_csv(self.dataset_csv)
-            self.df_init = self.df_init.drop_duplicates()
-            self.df_init = self.df_init.drop_duplicates(subset=[self.col_time], keep="first")
+
+
+            # преобразуем время
+            self.df_init[self.col_time] = pd.to_datetime(
+                self.df_init[self.col_time],
+                errors="coerce"
+            )
+
+            # сортируем по времени
+            self.df_init = (
+                self.df_init
+                .sort_values(by=self.col_time, ascending=True)
+                .drop_duplicates(subset=[self.col_time], keep="first")
+                .reset_index(drop=True)
+            )
+
             self.existing_cols = [c for c in self.cols_to_select if c in self.df_init.columns]
             self.df_init = self.df_init[self.existing_cols]
 
@@ -130,14 +144,13 @@ class RunModel:
                 t2v = Time2Vec(col_time=self.col_time, col_target=self.col_target)
                 self.df_features, self.min_val, self.max_val = t2v.encoder(df=self.df_init)
 
-                # self.df_real_pred_features, _, _ = t2v.encoder(df=self.df_real_pred)
-
                 self.col_for_train = [
                     col
                     for col in self.df_features.columns
                     if col not in {self.col_time, self.col_target}
-                       and self.df_features[col].nunique(dropna=False) > 1
                 ]
+
+                print(f"self.col_for_train  = {self.col_for_train }")
 
             except Exception as e:
                 self.logger.error(f" Func run_time2vec | Model - {self.model} | Points - { self.test_points} | {e}")
