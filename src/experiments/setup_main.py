@@ -107,8 +107,8 @@ def run_setup(experiment):
         logger.error(e)
 
 
-for _, row_exp in df_to_setup.iterrows():
-    run_setup(experiment=row_exp)
+# for _, row_exp in df_to_setup.iterrows():
+#     run_setup(experiment=row_exp)
 
 if __name__ == "__main__":
 
