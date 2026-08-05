@@ -2,7 +2,7 @@
 pdm run src/experiments/setup_main.py
 """
 import os
-
+import gc
 from tqdm import tqdm
 
 from src.utils.logger import get_logger
@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WORKERS = 12
 
-EXPERIMENT_NAME = "prod_2"
+EXPERIMENT_NAME = "prod_fix"
 
 home = os.getcwd()
 export_path = os.path.join(home, "export")
@@ -101,15 +101,20 @@ def run_setup(experiment):
         progress_writer(experiment_row=row_params, experiment_path=path_to_save, progress_name="setups_params")
         progress_writer(experiment_row=experiment, experiment_path=experiment_path, progress_name="progress_setup")
 
-
-
     except Exception as e:
         logger.error(e)
 
+    finally:
+        if setups_pipeline is not None:
+            setups_pipeline.clear_memory()
+
+        del setups_pipeline
+        gc.collect()
 
 # for _, row_exp in df_to_setup.iterrows():
 #     run_setup(experiment=row_exp)
 
+#
 if __name__ == "__main__":
 
     experiments = [

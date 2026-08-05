@@ -153,3 +153,161 @@ def add_fourier_features(
         )
 
     return df, fourier_columns
+
+
+import numpy as np
+import pandas as pd
+
+
+def fit_fourier_features(
+        df: pd.DataFrame,
+        time_column: str,
+        target_column: str,
+        energy_threshold: float = 0.95,
+        max_harmonics: int = 6
+):
+    """
+    Обучение Fourier-признаков.
+    Находит частоты и сохраняет параметры.
+    """
+
+    df = df.copy()
+
+    df[time_column] = pd.to_datetime(df[time_column])
+    df = df.sort_values(time_column).reset_index(drop=True)
+
+    y = pd.to_numeric(
+        df[target_column],
+        errors="coerce"
+    ).values
+
+    if np.isnan(y).any():
+        raise ValueError("Target contains NaN")
+
+
+    # интервал времени в секундах
+    interval_seconds = (
+        df[time_column]
+        .diff()
+        .dt.total_seconds()
+        .median()
+    )
+
+
+    if interval_seconds <= 0:
+        raise ValueError("Invalid time interval")
+
+
+    # FFT
+    y_centered = y - np.mean(y)
+
+    fft_values = np.fft.fft(y_centered)
+
+    frequencies = np.fft.fftfreq(
+        len(y),
+        d=interval_seconds
+    )
+
+
+    power = np.abs(fft_values) ** 2
+
+
+    mask = frequencies > 0
+
+    frequencies = frequencies[mask]
+    power = power[mask]
+
+
+    idx_sorted = np.argsort(power)[::-1]
+
+
+    total_power = power.sum()
+
+    selected = []
+    accumulated = 0
+
+
+    for idx in idx_sorted:
+
+        selected.append(idx)
+
+        accumulated += power[idx]
+
+        if (
+                accumulated / total_power >= energy_threshold
+                or len(selected) >= max_harmonics
+        ):
+            break
+
+
+    selected_frequencies = frequencies[selected]
+
+
+    params = {
+        "frequencies": selected_frequencies.tolist(),
+        "start_time": df[time_column].iloc[0],
+        "interval_seconds": interval_seconds
+    }
+
+
+    return params
+
+
+def transform_fourier_features(
+        df: pd.DataFrame,
+        time_column: str,
+        params: dict
+):
+    """
+    Генерация Fourier-признаков
+    для любых дат.
+    """
+
+    df = df.copy()
+
+    df[time_column] = pd.to_datetime(
+        df[time_column]
+    )
+
+
+    start_time = pd.Timestamp(
+        params["start_time"]
+    )
+
+
+    frequencies = params["frequencies"]
+
+
+    time_seconds = (
+            df[time_column] - start_time
+    ).dt.total_seconds().values
+
+
+
+    columns = []
+
+
+    for i, freq in enumerate(frequencies, 1):
+
+        sin_col = f"fourier_sin_{i}"
+        cos_col = f"fourier_cos_{i}"
+
+
+        df[sin_col] = np.sin(
+            2 * np.pi * freq * time_seconds
+        )
+
+        df[cos_col] = np.cos(
+            2 * np.pi * freq * time_seconds
+        )
+
+
+        columns.extend(
+            [
+                sin_col,
+                cos_col
+            ]
+        )
+
+
+    return df, columns

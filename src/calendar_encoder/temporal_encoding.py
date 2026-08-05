@@ -95,9 +95,6 @@ class Time2Vec:
 
         return df_with_meta
 
-    def normalize_column(self, column, min_val, max_val):
-        return (column - min_val) / (max_val - min_val)
-
     def inverse_normalize_column(self, column, min_val, max_val):
         return column * (max_val - min_val) + min_val
 
@@ -185,7 +182,7 @@ class Time2Vec:
             normalized_dates.append(normalized_date)
 
         normalized_df = pd.DataFrame(normalized_dates, columns=col_vec + diff_cols)
-        normalized_df[self.col_target] = self.normalize_column(normalized_df[self.col_target], min_val, max_val)
+        # normalized_df[self.col_target] = self.normalize_column(normalized_df[self.col_target], min_val, max_val)
         cols = [c for c in normalized_df.columns if c != self.col_time]
         normalized_df[cols] = normalized_df[cols].apply(pd.to_numeric, errors="coerce").astype("float64")
 
