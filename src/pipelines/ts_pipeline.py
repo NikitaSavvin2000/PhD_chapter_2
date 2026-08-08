@@ -1,7 +1,7 @@
 import pandas as pd
 
 from src.calendar_encoder.temporal_encoding import Time2Vec
-from src.calendar_encoder.fourier_encoding import add_fourier_features
+from src.calendar_encoder.fourier_encoding import fit_fourier_features, transform_fourier_features
 
 from src.ts_models.time_series_split import split_train_test
 from src.experiments.main_design import time_series_models_funcs
@@ -52,6 +52,7 @@ class RunModel:
         self.calendar_components_cols = ["year", "month", "day", "hour", "minute", "second"]
         self.time_series_models_funcs = time_series_models_funcs
         self.max_lag = 50
+
 
     def load_dataset(self):
         """
@@ -120,17 +121,15 @@ class RunModel:
             self.last_known_data = pd.to_datetime(self.df_init[self.col_time]).max()
             self.discreteness_sec = calculate_discreteness_interval(df=self.df_init, time_column=self.col_time)
 
-            self.df_real_pred = generate_time_series_df(
-                start_date=self.last_known_data,
-                n_rows=self.predict_points,
-                freq_seconds=self.discreteness_sec ,
-                col_time=self.col_time,
-                col_target=self.col_target,
-            )
+
+            self.df_train = self.df_init[:-self.predict_points]
+            self.df_test = self.df_init[-self.predict_points:]
+
         except Exception as e:
             self.logger.error(f" Func prepare_future_dataframe | Model - {self.model}  | Points - { self.test_points} | {e}")
             raise e
         return self
+
 
     def generate_features(self):
         """
@@ -142,7 +141,9 @@ class RunModel:
         if self.trajectory == "baseline" or self.trajectory == "t2v" or self.trajectory == "time2vec":
             try:
                 t2v = Time2Vec(col_time=self.col_time, col_target=self.col_target)
-                self.df_features, self.min_val, self.max_val = t2v.encoder(df=self.df_init)
+                self.df_features, self.min_val, self.max_val = t2v.encoder(df=self.df_train)
+
+                self.df_real_pred_features, _, _ = t2v.encoder(df=self.df_test)
 
                 self.col_for_train = [
                     col
@@ -150,7 +151,6 @@ class RunModel:
                     if col not in {self.col_time, self.col_target}
                 ]
 
-                print(f"self.col_for_train  = {self.col_for_train }")
 
             except Exception as e:
                 self.logger.error(f" Func run_time2vec | Model - {self.model} | Points - { self.test_points} | {e}")
@@ -159,16 +159,24 @@ class RunModel:
 
         elif self.trajectory == "fourier":
             try:
-                self.df_features, self.col_for_train = add_fourier_features(
-                    df=self.df_init,
+
+                fourier_params = fit_fourier_features(
+                    df=self.df_train,
                     time_column=self.col_time,
                     target_column=self.col_target
                 )
-                # self.df_real_pred_features, _ = add_fourier_features(
-                #     df=self.df_real_pred,
-                #     time_column=self.col_time,
-                #     target_column=self.col_target
-                # )
+
+                self.df_features, self.col_for_train = transform_fourier_features(
+                    df=self.df_init,
+                    time_column=self.col_time,
+                    params=fourier_params
+                )
+
+                self.df_real_pred_features, _ = transform_fourier_features(
+                    df=self.df_test,
+                    time_column=self.col_time,
+                    params=fourier_params
+                )
 
             except Exception as e:
                 self.logger.error(f" Func фурье | Model - {self.model} | Points - { self.test_points} | {e}")
@@ -187,15 +195,7 @@ class RunModel:
         ZH: 训练/测试划分
         """
         try:
-            self.df_train, self.df_test = split_train_test(
-                df=self.df_features,
-                start_train_date=self.start_train_date,
-                end_train_date=self.end_train_date,
-                start_test_date=self.start_test_date,
-                end_test_date=self.end_test_date,
-                col_time=self.col_time,
-                logger=self.logger
-            )
+            self.df_train, self.df_test = self.df_features, self.df_real_pred_features
 
             self.df_eval = self.df_test.copy()
             self.df_eval = self.df_eval[[self.col_time, self.col_target]]
@@ -206,6 +206,7 @@ class RunModel:
             raise e
 
         return self
+
 
     def fetch_all_t2v_features(self):
 

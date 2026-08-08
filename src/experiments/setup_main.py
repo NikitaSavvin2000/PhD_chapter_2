@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WORKERS = 12
 
-EXPERIMENT_NAME = "prod_fix"
+EXPERIMENT_NAME = "prod_fix_2"
 
 home = os.getcwd()
 export_path = os.path.join(home, "export")
@@ -104,12 +104,6 @@ def run_setup(experiment):
     except Exception as e:
         logger.error(e)
 
-    finally:
-        if setups_pipeline is not None:
-            setups_pipeline.clear_memory()
-
-        del setups_pipeline
-        gc.collect()
 
 # for _, row_exp in df_to_setup.iterrows():
 #     run_setup(experiment=row_exp)

@@ -23,18 +23,6 @@ from sklearn.preprocessing import MinMaxScaler
 
 class SetupModel:
 
-    def __enter__(self):
-        return self
-
-    def clear_memory(self):
-        for attr in list(self.__dict__.keys()):
-            delattr(self, attr)
-
-        gc.collect()
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.clear_memory()
-        return False
 
     def __init__(
             self,
@@ -225,6 +213,7 @@ class SetupModel:
             raise e
 
         return self
+
 
     def fetch_all_t2v_features(self):
 
