@@ -26,7 +26,7 @@ result_path = os.path.join(experiment_path, "results")
 os.makedirs(result_path, exist_ok=True)
 
 progress_setup_csv_path = os.path.join(experiment_path, "progress_setup.csv")
-os.makedirs(progress_setup_csv_path, exist_ok=True)
+# os.makedirs(progress_setup_csv_path, exist_ok=True)
 
 df_setup = create_experiment_design(experiment_path=experiment_path)
 df_to_setup = progress_loader(df_experiment_design=df_setup, progress_csv_path=progress_setup_csv_path, logger=logger)
