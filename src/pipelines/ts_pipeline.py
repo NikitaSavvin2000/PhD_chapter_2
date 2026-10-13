@@ -181,7 +181,9 @@ class RunModel:
 
                 print(f"self.col_for_train = {self.col_for_train}")
 
-                self.col_for_train = ['month', 'day', 'week', 'day_of_week', 'hour', 'minute', 'second', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'week_sin', 'week_cos', 'month_sin', 'month_cos', 'part_of_day', 'is_night', 'is_weekend', 'day_of_year', 'season', 'season_sin', 'season_cos', 'quarter', 'quarter_sin', 'quarter_cos',]
+                # self.col_for_train = ['month', 'day', 'week', 'day_of_week', 'hour', 'minute', 'second', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'week_sin', 'week_cos', 'month_sin', 'month_cos', 'part_of_day', 'is_night', 'is_weekend', 'day_of_year', 'season', 'season_sin', 'season_cos', 'quarter', 'quarter_sin', 'quarter_cos',]
+                # self.col_for_train = ["year", 'month', 'day', 'week', 'day_of_week', 'hour', 'minute', 'second', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'week_sin', 'week_cos', 'month_sin', 'month_cos', 'part_of_day', 'is_night', 'is_weekend', 'day_of_year', 'season', 'season_sin', 'season_cos', 'quarter', 'quarter_sin', 'quarter_cos',]
+                self.col_for_train = ["year", 'month', 'day', 'week', 'day_of_week', 'hour', 'minute', 'second', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'week_sin', 'week_cos', 'month_sin', 'month_cos',  'day_of_year',]
 
 
             except Exception as e:
