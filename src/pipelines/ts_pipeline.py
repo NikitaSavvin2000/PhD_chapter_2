@@ -138,7 +138,7 @@ class RunModel:
         ZH: Time2Vec 编码
         """
 
-        if self.trajectory == "baseline" or self.trajectory == "t2v" or self.trajectory == "time2vec":
+        if self.trajectory == "baseline":
             try:
                 t2v = Time2Vec(col_time=self.col_time, col_target=self.col_target)
                 self.df_features, self.min_val, self.max_val = t2v.encoder(df=self.df_train)
@@ -150,6 +150,38 @@ class RunModel:
                     for col in self.df_features.columns
                     if col not in {self.col_time, self.col_target}
                 ]
+
+                self.col_for_train = [
+                    "year",
+                    "month",
+                    "day",
+                    "hour",
+                    "minute",
+                    "second",
+                ]
+                print(f"self.col_for_train = {self.col_for_train}")
+
+            except Exception as e:
+                self.logger.error(f" Func run_time2vec | Model - {self.model} | Points - { self.test_points} | {e}")
+
+                raise e
+
+        elif self.trajectory == "t2v" or self.trajectory == "time2vec":
+            try:
+                t2v = Time2Vec(col_time=self.col_time, col_target=self.col_target)
+                self.df_features, self.min_val, self.max_val = t2v.encoder(df=self.df_train)
+
+                self.df_real_pred_features, _, _ = t2v.encoder(df=self.df_test)
+
+                self.col_for_train = [
+                    col
+                    for col in self.df_features.columns
+                    if col not in {self.col_time, self.col_target}
+                ]
+
+                print(f"self.col_for_train = {self.col_for_train}")
+
+                self.col_for_train = ['month', 'day', 'week', 'day_of_week', 'hour', 'minute', 'second', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'week_sin', 'week_cos', 'month_sin', 'month_cos', 'part_of_day', 'is_night', 'is_weekend', 'day_of_year', 'season', 'season_sin', 'season_cos', 'quarter', 'quarter_sin', 'quarter_cos',]
 
 
             except Exception as e:

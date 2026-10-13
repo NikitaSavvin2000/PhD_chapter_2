@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WORKERS = 12
 
-EXPERIMENT_NAME = "prod_npt_setup_11_10_2026"
+EXPERIMENT_NAME = "prod_npt_setup_13_10_2026"
 # SETUP_DIR_NAME = "prod"
 SETUP_DIR_NAME = "prod_fix_2"
 
