@@ -170,7 +170,7 @@ class RunModel:
                     logger=self.logger,
                 )
             except Exception as e:
-                self.logger.error(f" Func select_best_t2v_otuna | Model - {self.model} | Trajectory - {self.trajectory_cols} | Points - { self.test_points} | {e}")
+                self.logger.error(f" Func select_best_t2v_otuna | Model - {self.model} | Points - { self.test_points} | {e}")
 
                 raise e
 
