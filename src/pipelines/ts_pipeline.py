@@ -271,6 +271,8 @@ class RunModel:
                     if col not in {self.col_time, self.col_target}
                 ]
 
+                self.df_train, self.df_test = self.df_features, self.df_real_pred_features
+
                 self.col_for_train = [
                     "year",
                     "month",
@@ -298,6 +300,8 @@ class RunModel:
                     for col in self.df_features.columns
                     if col not in {self.col_time, self.col_target}
                 ]
+
+                self.df_train, self.df_test = self.df_features, self.df_real_pred_features
 
                 final_cols, final_metrics, final_pred = self.select_best_cols_otuna(all_features=self.col_for_train)
 
@@ -332,6 +336,8 @@ class RunModel:
                     params=fourier_params
                 )
 
+                self.df_train, self.df_test = self.df_features, self.df_real_pred_features
+
                 final_cols, final_metrics, final_pred = self.select_best_cols_otuna(all_features=self.col_for_train)
 
                 self.col_for_train = final_cols
@@ -353,8 +359,6 @@ class RunModel:
         ZH: 训练/测试划分
         """
         try:
-            self.df_train, self.df_test = self.df_features, self.df_real_pred_features
-
             self.df_eval = self.df_test.copy()
             self.df_eval = self.df_eval[[self.col_time, self.col_target]]
             self.df_test[self.col_target] = None
