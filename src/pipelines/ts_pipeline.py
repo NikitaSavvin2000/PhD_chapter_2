@@ -11,6 +11,10 @@ from src.ts_models.ts_utils.timeseries_utils import (regression_metrics,
                                                      assign_end_train_start_test_date,
                                                      )
 
+import optuna
+import random
+
+
 from sklearn.preprocessing import MinMaxScaler
 
 
@@ -130,6 +134,119 @@ class RunModel:
             raise e
         return self
 
+    def select_best_cols_otuna(
+            self,
+            all_features,
+            n_trials=50,
+            penalty=0.001,
+            cache_enabled=True,
+            sampler_seed=42,
+    ):
+
+        print(f"select_best_cols_otuna lag = {self.lag}")
+
+        cache = {}
+
+        def run_model(cols):
+            key = tuple(sorted(cols))
+
+            if cache_enabled and key in cache:
+                return cache[key]
+
+            predict_row = {}
+            predict_row["col_for_train"] = cols
+
+            start_time = time.time()
+
+            try:
+                df_test_pred = self.forecast_func(
+                    col_target=self.col_target,
+                    time_column=self.col_time,
+                    df_train=self.df_train,
+                    df_test=self.df_test,
+                    lag=self.lag,
+                    params=self.params,
+                    col_for_train=cols,
+                    logger=self.logger,
+                )
+            except Exception as e:
+                self.logger.error(f" Func select_best_t2v_otuna | Model - {self.model} | Trajectory - {self.trajectory_cols} | Points - { self.test_points} | {e}")
+
+                raise e
+
+            execution_time = time.time() - start_time
+            predict_row["pipeline_spend_time"] = execution_time
+            predict_row["model_params"] = self.params
+            predict_row["lag"] = self.lag
+
+            true = self.df_eval[self.col_target].tolist()
+            pred = df_test_pred[self.col_target].tolist()
+
+            metrics = regression_metrics(true=true, pred=pred)
+
+            print(f"OPTINA {metrics}")
+
+            score = metrics.get("mape", float("inf"))
+            score += penalty * len(cols)
+
+            res = (score, metrics, df_test_pred)
+
+            if cache_enabled:
+                cache[key] = res
+
+            return res
+
+        def objective(trial):
+            selected_cols = []
+
+            for col in all_features:
+                use_col = trial.suggest_categorical(col, [True, False])
+
+                if use_col:
+                    selected_cols.append(col)
+
+            if len(selected_cols) == 0:
+                selected_cols = [random.choice(all_features)]
+
+            print(selected_cols)
+
+            score, metrics, pred = run_model(selected_cols)
+
+            trial.set_user_attr("selected_cols", selected_cols)
+            trial.set_user_attr("metrics", metrics)
+
+            return score
+
+        sampler = optuna.samplers.TPESampler(seed=sampler_seed)
+
+        study = optuna.create_study(
+            direction="minimize",
+            sampler=sampler,
+        )
+
+        default_features = {
+            col: True for col in all_features
+        }
+
+        study.enqueue_trial(default_features)
+
+        study.optimize(
+            objective,
+            n_trials=n_trials,
+        )
+
+        best_trial = study.best_trial
+
+        final_cols = best_trial.user_attrs["selected_cols"]
+
+        final_score, final_metrics, final_pred = run_model(final_cols)
+
+        self.logger.info(f"FINAL_COLS={final_cols}")
+        self.logger.info(f"FINAL_MAPE={final_score}")
+        self.logger.info(f"BEST_TRIAL={best_trial.number}")
+
+        return final_cols, final_metrics, final_pred
+
 
     def generate_features(self):
         """
@@ -179,11 +296,11 @@ class RunModel:
                     if col not in {self.col_time, self.col_target}
                 ]
 
-                print(f"self.col_for_train = {self.col_for_train}")
+                final_cols, final_metrics, final_pred = self.select_best_cols_otuna(all_features=self.col_for_train)
 
-                # self.col_for_train = ['month', 'day', 'week', 'day_of_week', 'hour', 'minute', 'second', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'week_sin', 'week_cos', 'month_sin', 'month_cos', 'part_of_day', 'is_night', 'is_weekend', 'day_of_year', 'season', 'season_sin', 'season_cos', 'quarter', 'quarter_sin', 'quarter_cos',]
-                # self.col_for_train = ["year", 'month', 'day', 'week', 'day_of_week', 'hour', 'minute', 'second', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'week_sin', 'week_cos', 'month_sin', 'month_cos', 'part_of_day', 'is_night', 'is_weekend', 'day_of_year', 'season', 'season_sin', 'season_cos', 'quarter', 'quarter_sin', 'quarter_cos',]
-                self.col_for_train = ["year", 'month', 'day', 'week', 'day_of_week', 'hour', 'minute', 'second', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'week_sin', 'week_cos', 'month_sin', 'month_cos',  'day_of_year',]
+                self.col_for_train = final_cols
+
+                print(f"self.col_for_train = {self.col_for_train}")
 
 
             except Exception as e:
@@ -211,6 +328,10 @@ class RunModel:
                     time_column=self.col_time,
                     params=fourier_params
                 )
+
+                final_cols, final_metrics, final_pred = self.select_best_cols_otuna(all_features=self.col_for_train)
+
+                self.col_for_train = final_cols
 
             except Exception as e:
                 self.logger.error(f" Func фурье | Model - {self.model} | Points - { self.test_points} | {e}")
@@ -275,7 +396,7 @@ class RunModel:
             true = self.df_eval[self.col_target].tolist()
             metrics = regression_metrics(true=true, pred=pred)
 
-            return metrics, df_pred, self.df_eval
+            return metrics, df_pred, self.df_eval, self.col_for_train
 
         except Exception as e:
             self.logger.error(e)

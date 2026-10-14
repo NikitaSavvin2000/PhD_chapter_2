@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WORKERS = 12
 
-EXPERIMENT_NAME = "prod_npt_setup_13_10_2026_v2"
+EXPERIMENT_NAME = "prod_npt_setup_14_10_2026_v1"
 # SETUP_DIR_NAME = "prod"
 SETUP_DIR_NAME = "prod_fix_2"
 
@@ -108,7 +108,7 @@ def run_setup(experiment):
 
         setups_pipeline.run_split()
         setups_pipeline.fetch_all_t2v_features()
-        metrics, df_pred, df_test = setups_pipeline.run_model()
+        metrics, df_pred, df_test, col_for_train = setups_pipeline.run_model()
 
         vis_ts_predict(
             df_pred=df_pred,
@@ -126,10 +126,9 @@ def run_setup(experiment):
             "model": experiment["model"],
             "dataset_name": dataset_name,
             "best_params": params,
-            "best_metrics": metrics
+            "best_metrics": metrics,
+            "col_for_train": col_for_train
         }
-
-        print(metrics)
 
         print(f"СОХРАНЯЕМ {model} | {dataset_name} | {points_to_pred}")
         csv_writer(df=df_pred, save_path=path_to_save, file_name="pred")
