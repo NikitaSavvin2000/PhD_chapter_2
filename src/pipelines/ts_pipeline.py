@@ -56,6 +56,8 @@ class RunModel:
         self.calendar_components_cols = ["year", "month", "day", "hour", "minute", "second"]
         self.time_series_models_funcs = time_series_models_funcs
         self.max_lag = 50
+        self.forecast_func = time_series_models_funcs[self.model]
+
 
 
     def load_dataset(self):
@@ -133,6 +135,7 @@ class RunModel:
             self.logger.error(f" Func prepare_future_dataframe | Model - {self.model}  | Points - { self.test_points} | {e}")
             raise e
         return self
+
 
     def select_best_cols_otuna(
             self,
@@ -378,8 +381,6 @@ class RunModel:
     def run_model(self):
 
         try:
-
-            self.forecast_func = time_series_models_funcs[self.model]
 
             df_pred = self.forecast_func(
                 col_target=self.col_target,
