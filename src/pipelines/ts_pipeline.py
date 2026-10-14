@@ -13,7 +13,7 @@ from src.ts_models.ts_utils.timeseries_utils import (regression_metrics,
 
 import optuna
 import random
-
+import time
 
 from sklearn.preprocessing import MinMaxScaler
 
