@@ -14,7 +14,7 @@ from src.ts_models.ts_utils.timeseries_utils import (regression_metrics,
 import optuna
 import random
 import time
-
+import math
 from sklearn.preprocessing import MinMaxScaler
 
 
@@ -141,7 +141,7 @@ class RunModel:
     def select_best_cols_otuna(
             self,
             all_features,
-            n_trials=20,
+            n_trials=30,
             cache_enabled=True,
             sampler_seed=42,
     ):
