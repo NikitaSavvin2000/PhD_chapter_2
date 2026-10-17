@@ -102,10 +102,9 @@ def run_setup(experiment):
         )
         setups_pipeline.load_dataset()
         setups_pipeline.prepare_future_dataframe()
+        setups_pipeline.run_split()
 
         setups_pipeline.generate_features()
-
-        setups_pipeline.run_split()
         setups_pipeline.fetch_all_t2v_features()
         metrics, df_pred, df_test, col_for_train = setups_pipeline.run_model()
 
