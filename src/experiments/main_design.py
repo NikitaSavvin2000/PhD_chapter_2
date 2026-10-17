@@ -24,7 +24,7 @@ export_path = os.path.join(home_path, "export")
 
 
 datasets_to_test = ["russia_amur_region"]
-models_to_exp = ["XGBoost",]
+models_to_exp = ["LSTM",]
 list_predict_points_to_test = [144,]
 trajectories = ["t2v"]
 
