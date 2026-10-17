@@ -137,15 +137,14 @@ class RunModel:
         return self
 
 
+
     def select_best_cols_otuna(
             self,
             all_features,
-            n_trials=30,
-            penalty=0.001,
+            n_trials=20,
             cache_enabled=True,
             sampler_seed=42,
     ):
-
         print(f"select_best_cols_otuna lag = {self.lag}")
 
         cache = {}
@@ -155,9 +154,6 @@ class RunModel:
 
             if cache_enabled and key in cache:
                 return cache[key]
-
-            predict_row = {}
-            predict_row["col_for_train"] = cols
 
             start_time = time.time()
 
@@ -173,26 +169,31 @@ class RunModel:
                     logger=self.logger,
                 )
             except Exception as e:
-                self.logger.error(f" Func select_best_t2v_otuna | Model - {self.model} | Points - { self.test_points} | {e}")
-
-                raise e
+                self.logger.error(
+                    f"Func select_best_cols_otuna | "
+                    f"Model - {self.model} | "
+                    f"Points - {self.test_points} | {e}"
+                )
+                raise
 
             execution_time = time.time() - start_time
-            predict_row["pipeline_spend_time"] = execution_time
-            predict_row["model_params"] = self.params
-            predict_row["lag"] = self.lag
 
             true = self.df_eval[self.col_target].tolist()
             pred = df_test_pred[self.col_target].tolist()
 
             metrics = regression_metrics(true=true, pred=pred)
+            mape = metrics.get("mape", float("inf"))
 
-            print(f"OPTINA {metrics}")
+            if not math.isfinite(mape):
+                mape = float("inf")
 
-            score = metrics.get("mape", float("inf"))
-            score += penalty * len(cols)
+            print(
+                f"OPTUNA | MAPE={mape:.6f}% | "
+                f"Features={len(cols)} | "
+                f"Time={execution_time:.3f}s"
+            )
 
-            res = (score, metrics, df_test_pred)
+            res = (mape, metrics, df_test_pred)
 
             if cache_enabled:
                 cache[key] = res
@@ -200,20 +201,17 @@ class RunModel:
             return res
 
         def objective(trial):
-            selected_cols = []
+            selected_cols = [
+                col
+                for col in all_features
+                if trial.suggest_categorical(col, [True, False])
+            ]
 
-            for col in all_features:
-                use_col = trial.suggest_categorical(col, [True, False])
-
-                if use_col:
-                    selected_cols.append(col)
-
-            if len(selected_cols) == 0:
+            # Не допускаем пустого набора признаков
+            if not selected_cols:
                 selected_cols = [random.choice(all_features)]
 
-            print(selected_cols)
-
-            score, metrics, pred = run_model(selected_cols)
+            score, metrics, _ = run_model(selected_cols)
 
             trial.set_user_attr("selected_cols", selected_cols)
             trial.set_user_attr("metrics", metrics)
@@ -227,11 +225,10 @@ class RunModel:
             sampler=sampler,
         )
 
-        default_features = {
+        # Начинаем с модели, использующей все признаки
+        study.enqueue_trial({
             col: True for col in all_features
-        }
-
-        study.enqueue_trial(default_features)
+        })
 
         study.optimize(
             objective,
@@ -239,7 +236,6 @@ class RunModel:
         )
 
         best_trial = study.best_trial
-
         final_cols = best_trial.user_attrs["selected_cols"]
 
         final_score, final_metrics, final_pred = run_model(final_cols)
@@ -249,6 +245,7 @@ class RunModel:
         self.logger.info(f"BEST_TRIAL={best_trial.number}")
 
         return final_cols, final_metrics, final_pred
+
 
 
     def generate_features(self):
