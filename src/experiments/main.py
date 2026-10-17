@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WORKERS = 4
 
-EXPERIMENT_NAME = "prod_npt_setup_14_10_2026_v1"
+EXPERIMENT_NAME = "prod_npt_setup_17_10_2026_v_test"
 # SETUP_DIR_NAME = "prod"
 SETUP_DIR_NAME = "prod_fix_2"
 
@@ -142,30 +142,30 @@ def run_setup(experiment):
         logger.error(e)
 
 
-# for _, row_exp in df_to_setup.iterrows():
-#     run_setup(experiment=row_exp)
+for _, row_exp in df_to_setup.iterrows():
+    run_setup(experiment=row_exp)
 
-if __name__ == "__main__":
-
-    experiments = [
-        row_exp.to_dict()
-        for _, row_exp in df_to_setup.iterrows()
-    ]
-
-    print(f"Experiments: {len(experiments)}")
-
-    with ThreadPoolExecutor(
-            max_workers=WORKERS
-    ) as executor:
-
-        futures = [
-            executor.submit(run_setup, exp)
-            for exp in experiments
-        ]
-
-        for future in tqdm(
-                as_completed(futures),
-                total=len(futures),
-                desc="Experiments"
-        ):
-            future.result()
+# if __name__ == "__main__":
+#
+#     experiments = [
+#         row_exp.to_dict()
+#         for _, row_exp in df_to_setup.iterrows()
+#     ]
+#
+#     print(f"Experiments: {len(experiments)}")
+#
+#     with ThreadPoolExecutor(
+#             max_workers=WORKERS
+#     ) as executor:
+#
+#         futures = [
+#             executor.submit(run_setup, exp)
+#             for exp in experiments
+#         ]
+#
+#         for future in tqdm(
+#                 as_completed(futures),
+#                 total=len(futures),
+#                 desc="Experiments"
+#         ):
+#             future.result()
