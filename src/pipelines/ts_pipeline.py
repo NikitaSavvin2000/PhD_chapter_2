@@ -141,7 +141,7 @@ class RunModel:
     def select_best_cols_otuna(
             self,
             all_features,
-            n_trials=30,
+            n_trials=100,
             cache_enabled=True,
             sampler_seed=42,
     ):

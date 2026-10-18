@@ -14,9 +14,9 @@ from src.utils.charts import vis_ts_predict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-WORKERS = 6
+WORKERS = 12
 
-EXPERIMENT_NAME = "prod_npt_setup_17_10_2026_v1"
+EXPERIMENT_NAME = "prod_not_setup_18_10_2026_v1"
 # SETUP_DIR_NAME = "prod"
 SETUP_DIR_NAME = "prod_fix_2"
 
