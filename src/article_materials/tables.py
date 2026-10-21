@@ -17,7 +17,7 @@ home_path = os.getcwd()
 export_path = os.path.join(home_path, "export", "export_server")
 
 res_dir_name = "prod_fix_2"
-res_dir_name = "prod_npt_setup_17_10_2026_v1"
+res_dir_name = "prod_not_setup_18_10_2026_v1"
 
 
 res_dir_path = os.path.join(export_path, res_dir_name)
