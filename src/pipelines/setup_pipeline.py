@@ -44,11 +44,11 @@ class SetupModel:
         self.dataset_csv = csv_link
         self.col_time = col_time
         self.col_target = col_target
-        self.predict_points = test_points
+        self.predict_points = int(test_points)
         self.trajectory = trajectory
 
         self.logger = logger
-        self.test_points=test_points
+        self.test_points=int(test_points)
         self.df_experiment_design = None
         self.df_init = None
         self.df_features = None
@@ -69,9 +69,10 @@ class SetupModel:
 
         try:
 
+            i = 0
+
             self.cols_to_select = [self.col_time, self.col_target]
             self.df_init = pd.read_csv(self.dataset_csv)
-
 
             # преобразуем время
             self.df_init[self.col_time] = pd.to_datetime(
@@ -101,12 +102,12 @@ class SetupModel:
             self.discreteness_sec = calculate_discreteness_interval(df=self.df_init, time_column=self.col_time)
             self.start_train_date = self.first_known_data
 
+            self.test_points = int(self.test_points)
             self.end_train_date, self.start_test_date = assign_end_train_start_test_date(
                 df=self.df_init,
                 col_time=self.col_time,
                 test_points=self.test_points,
             )
-
             self.end_test_date = self.last_known_data
 
             self.logger.info("Загрузили датасет")
