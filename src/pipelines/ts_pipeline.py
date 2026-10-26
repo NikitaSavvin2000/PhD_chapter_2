@@ -2,6 +2,7 @@ import pandas as pd
 
 from src.calendar_encoder.temporal_encoding import Time2Vec
 from src.calendar_encoder.fourier_encoding import fit_fourier_features, transform_fourier_features
+from src.calendar_encoder.rolling_stats_encoding import transform_rollings_stats_features
 
 from src.ts_models.time_series_split import split_train_test
 from src.experiments.main_design import time_series_models_funcs
@@ -343,6 +344,63 @@ class RunModel:
                 self.logger.error(f" Func фурье | Model - {self.model} | Points - { self.test_points} | {e}")
 
                 raise e
+
+        elif self.trajectory == "rollings_stats":
+            try:
+                # The trajectory retains the calendar variables used by the
+                # baseline and augments them with target-history statistics.
+                # ``self.lag`` is read from the baseline setup in main.py.
+                t2v = Time2Vec(col_time=self.col_time, col_target=self.col_target)
+                self.df_features, self.min_val, self.max_val = t2v.encoder(
+                    df=self.df_train
+                )
+                self.df_real_pred_features, _, _ = t2v.encoder(
+                    df=self.df_test
+                )
+
+                baseline_lag = max(2, int(self.lag))
+                rolling_windows = sorted({
+                    max(2, baseline_lag // 4),
+                    max(2, baseline_lag // 2),
+                    baseline_lag,
+                })
+                self.df_features, rolling_cols = transform_rollings_stats_features(
+                    df=self.df_features,
+                    time_column=self.col_time,
+                    target_column=self.col_target,
+                    windows=rolling_windows,
+                )
+                self.df_real_pred_features, _ = transform_rollings_stats_features(
+                    df=self.df_real_pred_features,
+                    time_column=self.col_time,
+                    target_column=self.col_target,
+                    windows=rolling_windows,
+                    history=self.df_features[[self.col_time, self.col_target]],
+                )
+
+                self.df_train, self.df_test = (
+                    self.df_features,
+                    self.df_real_pred_features,
+                )
+                # baseline_cols = [
+                #     "year",
+                #     "month",
+                #     "day",
+                #     "hour",
+                #     "minute",
+                #     "second",
+                # ]
+                # self.col_for_train = baseline_cols + rolling_cols
+                self.col_for_train =  rolling_cols
+
+                print(f"self.col_for_train = {self.col_for_train}")
+
+            except Exception as e:
+                self.logger.error(
+                    f" Func rollings_stats | Model - {self.model} | "
+                    f"Points - {self.test_points} | {e}"
+                )
+                raise
 
         else:
             raise "Неизвестная траектория"

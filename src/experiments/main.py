@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WORKERS = 12
 
-EXPERIMENT_NAME = "prod_not_setup_18_10_2026_v1"
+EXPERIMENT_NAME = "prod_not_setup_26_10_2026_v1"
 # SETUP_DIR_NAME = "prod"
 SETUP_DIR_NAME = "prod_fix_2"
 
@@ -42,6 +42,7 @@ print(f"Line 30")
 
 
 def read_params(setup_path, dataset_name, model, points_to_pred):
+    """Load the baseline configuration shared by every feature trajectory."""
 
     csv_params = os.path.join(
         setup_path,

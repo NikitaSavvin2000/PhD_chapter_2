@@ -18,11 +18,24 @@ home_path = os.getcwd()
 export_path = os.path.join(home_path, "export")
 
 # datasets_to_test = ["russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
-datasets_to_test = ["russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
+datasets_to_test = [
+    "russia_amur_region",
+    "Daily_Climate",
+    "Istanbul_Traffic_Index",
+    "Temperature_in_Celsius",
+    "morocco_zone_1",
+    "russia_elista",
+    "Air_Quality_India",
+    "Daily_Climate",
+    "NYC_Taxi_Traffic",
+    "Weather",
+    "Metro_Traffic",
+]
+
 
 models_to_exp = ["LSTM", "XGBoost",]
 list_predict_points_to_test = [144, 288, 576]
-trajectories = ["t2v", "baseline", "fourier"]
+trajectories = ["t2v", "baseline", "fourier", "rollings_stats"]
 
 
 # datasets_to_test = ["russia_amur_region"]
