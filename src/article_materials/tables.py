@@ -3,12 +3,12 @@ python src/article_materials/tables.py
 """
 
 import os
-import numpy as np
+# import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
-
-from matplotlib.gridspec import GridSpec
+# import matplotlib.pyplot as plt
+# import matplotlib.ticker as mticker
+#
+# from matplotlib.gridspec import GridSpec
 
 from src.data.data_config import datasets_csv_dict
 
@@ -17,20 +17,35 @@ home_path = os.getcwd()
 export_path = os.path.join(home_path, "export", "export_server")
 
 res_dir_name = "prod_fix_2"
-res_dir_name = "prod_not_setup_18_10_2026_v1"
+res_dir_name = "prod_not_setup_26_10_2026_v1"
 
 
 res_dir_path = os.path.join(export_path, res_dir_name)
 article_materials_path = os.path.join(res_dir_path, "article_materials")
 os.makedirs(article_materials_path, exist_ok=True)
 
-datasets_to_test = ["russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
+datasets_to_test = ["morocco_zone_1", "russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
+
+# datasets_to_test = [
+#     "russia_amur_region",
+#     "Daily_Climate",
+#     "Istanbul_Traffic_Index",
+#     "Temperature_in_Celsius",
+#     "morocco_zone_1",
+#     "russia_elista",
+#     "Air_Quality_India",
+#     "Daily_Climate",
+#     "NYC_Taxi_Traffic",
+#     "Weather",
+#     "Metro_Traffic",
+# ]
+
 models_to_exp = ["LSTM", "XGBoost",]
 
 list_predict_points_to_test = [144, 288, 576]
 # list_predict_points_to_test = [144, 288]
 
-trajectories = ["fourier", "baseline", "t2v"]
+trajectories = ["fourier", "baseline", "t2v", ""]
 
 
 
