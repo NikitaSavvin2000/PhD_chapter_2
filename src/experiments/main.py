@@ -28,9 +28,9 @@ from src.utils.csv_logger import CSVLogger
 # ============================================
 
 WORKERS = 12
-MAX_SEARCH_ITER = 1
+MAX_SEARCH_ITER = 50
 
-EXPERIMENT_NAME = "prod_not_setup_30_10_2026_v1"
+EXPERIMENT_NAME = "prod_not_setup_31_10_2026_v1"
 
 # SETUP_DIR_NAME = "prod"
 SETUP_DIR_NAME = "prod_fix_2"

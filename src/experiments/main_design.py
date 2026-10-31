@@ -3,6 +3,7 @@ pdm run src/experiments/experiment_design.py
 """
 import os
 import pandas as pd
+import json
 
 from src.data.data_config import datasets_csv_dict
 from src.ts_models.xgboost_service.xgboost_pred import XGBoost_forecast
@@ -18,6 +19,7 @@ home_path = os.getcwd()
 export_path = os.path.join(home_path, "export")
 
 # datasets_to_test = ["russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
+
 datasets_to_test = [
     "russia_amur_region",
     "Daily_Climate",
@@ -26,7 +28,6 @@ datasets_to_test = [
     "morocco_zone_1",
     "russia_elista",
     "Air_Quality_India",
-    "Daily_Climate",
     "NYC_Taxi_Traffic",
     "Weather",
     "Metro_Traffic",
@@ -43,12 +44,18 @@ trajectories = ["t2v", "baseline", "fourier", "rollings_stats"]
 # list_predict_points_to_test = [144,]
 # trajectories = ["t2v"]
 
+data_path = os.path.join(os.getcwd(), "data")
+json_path = os.path.join(data_path, "datasets_csv_dict.json")
+
+with open(json_path, "r", encoding="utf-8") as f:
+    datasets_csv_dict = json.load(f)
 
 
 def create_experiment_design(experiment_path):
     rows = []
     for dataset in datasets_to_test:
-        csv = datasets_csv_dict[dataset]["csv_link"]
+        csv = os.path.join(os.getcwd(), datasets_csv_dict[dataset]["csv_link"])
+        # csv = datasets_csv_dict[dataset]["csv_link"]
         col_time = datasets_csv_dict[dataset]["col_time"]
         col_target = datasets_csv_dict[dataset]["col_target"]
         for model in models_to_exp:

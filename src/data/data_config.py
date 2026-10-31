@@ -1,4 +1,8 @@
-datasets_csv_dict = {
+"""
+python src/data/data_config.py
+"""
+
+datasets_csv_init = {
     "Australia_Bundoora": {
         "csv_link": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTl3ZMKUEqYeXJe1b8A4IbfYIKjWlm0lR61glDoXOEfHxsmDUv1ZZ2IK2GpjkH2fZ6fvX3NaCOryqzW/pub?gid=751874949&single=true&output=csv",
         "col_time": "Datetime",
@@ -101,3 +105,32 @@ datasets_csv_dict = {
     }
 }
 
+import os
+import json
+import pandas as pd
+
+home_path = os.path.join(os.getcwd(), "data")
+os.makedirs(home_path, exist_ok=True)
+
+datasets_csv_dict = {}
+
+for dataset_name, dataset_info in datasets_csv_init.items():
+    # 1. Читаем CSV в DataFrame
+    df = pd.read_csv(dataset_info["csv_link"])
+
+    # 2. Сохраняем CSV с названием датасета
+    csv_local_link = os.path.join("data", f"{dataset_name}.csv")
+    df.to_csv(csv_local_link, index=False)
+
+    # 3. Добавляем локальный путь в словарь
+    datasets_csv_dict[dataset_name] = {
+        **dataset_info,
+        "csv_local_link": csv_local_link
+    }
+
+# 4. Сохраняем словарь в JSON
+home_path = os.path.join(os.getcwd(), "data")
+json_path = os.path.join(home_path, "datasets_csv_dict.json")
+
+with open(json_path, "w", encoding="utf-8") as f:
+    json.dump(datasets_csv_dict, f, ensure_ascii=False, indent=4)
