@@ -5,7 +5,7 @@ import os
 import pandas as pd
 import json
 
-from src.data.data_config import datasets_csv_dict
+# from src.data.data_config import datasets_csv_dict
 from src.ts_models.xgboost_service.xgboost_pred import XGBoost_forecast
 from src.ts_models.lstm_service.lstm_pred import LSTM_forecast
 
