@@ -54,7 +54,7 @@ with open(json_path, "r", encoding="utf-8") as f:
 def create_experiment_design(experiment_path):
     rows = []
     for dataset in datasets_to_test:
-        csv = os.path.join(os.getcwd(), datasets_csv_dict[dataset]["csv_link"])
+        csv = os.path.join(os.getcwd(), datasets_csv_dict[dataset]["csv_local_link"])
         # csv = datasets_csv_dict[dataset]["csv_link"]
         col_time = datasets_csv_dict[dataset]["col_time"]
         col_target = datasets_csv_dict[dataset]["col_target"]
