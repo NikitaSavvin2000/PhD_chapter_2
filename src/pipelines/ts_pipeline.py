@@ -45,13 +45,13 @@ class RunModel:
         self.dataset_csv = csv_link
         self.col_time = col_time
         self.col_target = col_target
-        self.predict_points = test_points
+        self.predict_points = int(test_points)
         self.trajectory = trajectory
-        self.lag = lag
+        self.lag = int(lag)
         self.params = params
         self.dataset_name = dataset_name
         self.csv_logger = csv_logger
-        self.max_search_iter = max_search_iter
+        self.max_search_iter = int(max_search_iter)
 
         self.logger = logger
         self.test_points= int(test_points)
