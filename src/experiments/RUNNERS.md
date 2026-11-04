@@ -22,4 +22,4 @@ mkdir -p /Users/nikitasavvin/Desktop/PhD/PhD_chapter_2/export/export_server && s
 /exp/PhD_chapter_2/export/prod_not_setup_30_10_2026_v1
 
 
-scp -r nsavvin@192.168.1.67:~/exp/PhD_chapter_2/export/prod_not_setup_30_10_2026_v1/events.csv /Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/export/export_server
+scp -r nsavvin@95.165.85.82:~/exp/PhD_chapter_2/export/prod_not_setup_31_10_2026_v1/progress_setup.csv  /Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/export/export_server

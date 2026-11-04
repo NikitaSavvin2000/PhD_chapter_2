@@ -54,7 +54,7 @@ class RunModel:
         self.max_search_iter = max_search_iter
 
         self.logger = logger
-        self.test_points=test_points
+        self.test_points= int(test_points)
         self.df_experiment_design = None
         self.df_init = None
         self.df_features = None
