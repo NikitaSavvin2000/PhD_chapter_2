@@ -298,13 +298,13 @@ $$
 </p>
 
 $$
-\operatorname{MAE}=\frac{1}{H}\sum_{i=1}^{H}|y_i-\hat y_i|,\qquad
-\operatorname{RMSE}=\sqrt{\frac{1}{H}\sum_{i=1}^{H}(y_i-\hat y_i)^2},
+MAE=\frac{1}{H}\sum_{i=1}^{H}|y_i-\hat y_i|,\qquad
+RMSE=\sqrt{\frac{1}{H}\sum_{i=1}^{H}(y_i-\hat y_i)^2},
 \tag{16}
 $$
 
 $$
-\operatorname{MAPE}=\frac{100}{H}\sum_{i=1}^{H}
+MAPE=\frac{100}{H}\sum_{i=1}^{H}
 \left|\frac{y_i-\hat y_i}{\max(|y_i|,10^{-8})}\right|,\qquad
 R^2=1-\frac{\sum_i(y_i-\hat y_i)^2}{\sum_i(y_i-\bar y)^2}.
 \tag{17}
