@@ -1,0 +1,8 @@
+output=/Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/README.docx
+expected_text_chars=29867
+docx_text_chars=29867
+text_match=True
+embedded_images=10
+source_images=10
+hyperlinks=17
+omml_equations=59

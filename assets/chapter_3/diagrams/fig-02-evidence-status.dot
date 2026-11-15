@@ -1,0 +1,15 @@
+digraph evidence_status {
+  graph [rankdir=TB, bgcolor="white", pad="0.10", nodesep="0.20", ranksep="0.30"];
+  node [shape=box, style="rounded,filled", color="#263238", fillcolor="#FFFFFF", fontname="Times New Roman", fontsize=12, margin="0.18,0.10", penwidth=1.15];
+  edge [color="#263238", penwidth=1.1, arrowsize=0.70];
+
+  claim [label="Авторское положение\nо комплексе"];
+  e1 [label="Проверено действием\nмастер выбора примера CSV,\nпеременных и времени", fillcolor="#F4F7F8"];
+  e2 [label="Видно в интерфейсе\nэкспорт, метрики, БД,\nдиалоговый ввод", fillcolor="#F4F7F8"];
+  e3 [label="Статический ресурс клиента\nмаршруты планирования\nи обновления модели", fillcolor="#F4F7F8"];
+  gap [label="Недостающая проверка\nдрейф, переобучение,\nвнешний обмен, время реакции", style="rounded,dashed,filled", color="#7B1E22", fontcolor="#7B1E22", fillcolor="#FFF8F8"];
+  conclusion [label="Граница вывода\nинтеграционные интерфейсы\nнаблюдаемы; эффект\nоперативности не измерен", style="rounded,filled", color="#7B1E22", fontcolor="#7B1E22", fillcolor="#FFF8F8"];
+
+  claim -> e1 -> e2 -> e3 -> conclusion;
+  gap -> conclusion [style=dashed, color="#7B1E22"];
+}

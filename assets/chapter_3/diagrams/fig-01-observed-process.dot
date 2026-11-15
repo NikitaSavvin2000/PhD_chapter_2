@@ -1,0 +1,19 @@
+digraph observed_process {
+  graph [rankdir=TB, bgcolor="white", pad="0.10", nodesep="0.22", ranksep="0.35", splines=ortho];
+  node [shape=box, style="rounded,filled", color="#263238", fillcolor="#FFFFFF", fontname="Times New Roman", fontsize=12, margin="0.18,0.10", penwidth=1.15];
+  edge [color="#263238", penwidth=1.15, arrowsize=0.72];
+
+  input [label="Данные\nCSV, JSON, XLSX\nили таблица БД"];
+  select [label="Выбор времени\nи целевой величины"];
+  setup [label="Конфигурация\nисточник, горизонт,\nметод"];
+  request [label="Запрос прогноза\nв тестовом сценарии"];
+  output [label="Визуализация\nтаблица, MAE, MAPE,\nвыгрузка"];
+  db [label="Подключение\nPostgreSQL\n(интерфейс)", fillcolor="#F4F7F8"];
+  agent [label="Диалоговый интерфейс\nи контекст данных\n(интерфейс)", fillcolor="#F4F7F8"];
+  unknown [label="Обнаружение сдвига\nи адаптация модели\nне подтверждены", style="rounded,dashed,filled", color="#7B1E22", fontcolor="#7B1E22", fillcolor="#FFF8F8"];
+
+  input -> select -> setup -> request -> output;
+  agent -> select;
+  db -> setup;
+  unknown -> request [style=dashed, color="#7B1E22"];
+}
