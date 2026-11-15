@@ -15,7 +15,7 @@ export PYTHONPATH=$PWD/src:$PYTHONPATH
 
 mkdir -p /Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/export/export_server && scp -r nsavvin@192.168.1.67:~/exp/PhD_chapter_2/export/prod_npt_setup_17_10_2026_v1 /Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/export/export_server
 
-mkdir -p /Users/nikitasavvin/Desktop/PhD/PhD_chapter_2/export/export_server && scp -r nsavvin@95.165.85.82:~/exp/PhD_chapter_2/export/prod_not_setup_26_10_2026_v1 /Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/export/export_server
+mkdir -p /Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/export/export_server/prod_not_setup_31_10_2026_v1/results && scp -r nsavvin@192.168.1.67:~/exp/PhD_chapter_2/export/prod_not_setup_31_10_2026_v1/results /Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/export/export_server/prod_not_setup_31_10_2026_v1/results
 
 
 
@@ -23,3 +23,8 @@ mkdir -p /Users/nikitasavvin/Desktop/PhD/PhD_chapter_2/export/export_server && s
 
 
 scp -r nsavvin@95.165.85.82:~/exp/PhD_chapter_2/export/prod_not_setup_31_10_2026_v1/progress_setup.csv  /Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/export/export_server
+
+scp -r nsavvin@95.165.85.82:~/exp/PhD_chapter_2/export/prod_not_setup_31_10_2026_v1/prod_not_setup_31_10_2026_v1/results  /Users/nikitasavvin/Desktop/PhD/3_phd_chapter/PhD_chapter_2/export/export_server/prod_not_setup_31_10_2026_v1/results
+
+
+http://192.168.1.67:7095/

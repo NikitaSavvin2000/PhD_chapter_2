@@ -18,7 +18,6 @@ time_series_models_funcs = {
 home_path = os.getcwd()
 export_path = os.path.join(home_path, "export")
 
-# datasets_to_test = ["russia_amur_region", "Daily_Climate", "Istanbul_Traffic_Index", "Temperature_in_Celsius"]
 
 datasets_to_test = [
     "russia_amur_region",
